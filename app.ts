@@ -10,6 +10,7 @@ import morgan from 'morgan'; // the morgan is used to log the HTTP Request/Respo
 import { utc } from 'moment';
 import http from 'http';
 
+import helmet from 'helmet';
 
 import config from './config/config';
 import routes from './routes';
@@ -26,14 +27,16 @@ app.use(morgan('dev'));
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json({ limit: '10mb' }));
 
+// 
+
 // Configure CORS options with dynamic validation based on config
 const corsOptionsDelegate: CorsOptions = {
     origin: (origin, callback) => {
         // Allow all origins if config allows '*'
-        if(config.SERVER.CORS_ORIGINS[0] === '*'){
+        if (config.SERVER.CORS_ORIGINS[0] === '*') {
             callback(null, true);
         }
-        else if (!origin || config.SERVER.CORS_ORIGINS.includes(origin)){
+        else if (!origin || config.SERVER.CORS_ORIGINS.includes(origin)) {
             // Allow if origin is undefined (eg : server to server) or is ini whitelist
             callback(null, true);
         }
@@ -48,12 +51,22 @@ const corsOptionsDelegate: CorsOptions = {
 };
 app.use(cors(corsOptionsDelegate));
 
+// Use Helmet to set various HTTP headers for app security
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'"],
+        }
+    }
+}));
+
 // routes handlinig
 app.use('/api', routes);
 
 // create http server warapping the express app.
 const server = http.createServer(app);
-server.listen(config.SERVER.PORT, async() => {
+server.listen(config.SERVER.PORT, async () => {
     console.info('******************************************************************');
     console.info(`**** SERVER RUNNING ON PORT ${config.SERVER.PORT} ****************`);
     console.info('******************************************************************');
