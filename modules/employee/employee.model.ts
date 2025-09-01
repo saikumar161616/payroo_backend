@@ -1,6 +1,7 @@
 import { Schema, model, Document } from 'mongoose';
 import joi from 'joi';
 import { helperUtil } from '../../utilities/helper.util';
+import { STATUS, EMPLOYEE_TYPE } from '../../constants/feild.constants';
 
 export interface BankDetails {
     bsb: string;
@@ -12,11 +13,11 @@ export interface Employee extends Document {
     firstName: string;
     lastName: string;
     email: string;
-    type: 'HOURLY';
+    type: string;
     baseHourlyRate: number;
     superRate: number;
     bank: BankDetails;
-    status: 'ACTIVE' | 'INACTIVE';
+    status: string;
 };
 
 const BankDetailsSchema = new Schema<BankDetails>({
@@ -58,7 +59,7 @@ const employeeSchema = new Schema<Employee>({
     type: {
         type: String,
         required: true,
-        enum: ['HOURLY']
+        enum: [EMPLOYEE_TYPE.HOURLY]
     },
     baseHourlyRate: {
         type: Number,
@@ -75,8 +76,8 @@ const employeeSchema = new Schema<Employee>({
     status: {
         type: String,
         required: true,
-        enum: ['ACTIVE', 'INACTIVE'],
-        default: 'ACTIVE'
+        enum: [STATUS.ACTIVE, STATUS.INACTIVE],
+        default: STATUS.ACTIVE
         // This feild is helpful to easily enable, disable or soft-delete employees
         // without removing their data from the database. It allows filtering for only
         // active employees in queries and helps with audit trails and data integrity.
@@ -92,28 +93,28 @@ export const addEmployeeSchemaValidator = joi.object({
     firstName: joi.string().min(2).max(50).required(),
     lastName: joi.string().min(2).max(50).required(),
     email: joi.string().email().required(),
-    type: joi.string().valid('HOURLY').required(),
+    type: joi.string().valid(EMPLOYEE_TYPE.HOURLY).required(),
     baseHourlyRate: joi.number().required().min(0),
     superRate: joi.number().min(0).required(),
     bank: joi.object({
         bsb: joi.string().pattern(/^\d{3}-\d{3}$/).required(), // e.g., 083-123
         account: joi.string().pattern(/^\d{6,12}$/).required() // 6 to 12 digits eg: 12345678
     }).required(),
-    status: joi.string().valid('ACTIVE', 'INACTIVE').optional()
+    status: joi.string().valid(STATUS.ACTIVE, STATUS.INACTIVE).optional()
 });
 
 export const updateEmployeeSchemaValidator = joi.object({
     firstName: joi.string().min(2).max(50).optional(),
     lastName: joi.string().min(2).max(50).optional(),
     email: joi.string().email().optional(),
-    type: joi.string().valid('HOURLY').optional(),
+    type: joi.string().valid(EMPLOYEE_TYPE.HOURLY).optional(),
     baseHourlyRate: joi.number().min(0).optional(),
     superRate: joi.number().min(0).optional(),
     bank: joi.object({
         bsb: joi.string().pattern(/^\d{3}-\d{3}$/).required(),
         account: joi.string().pattern(/^\d{6,12}$/).required()
     }).optional(),
-    status: joi.string().valid('ACTIVE', 'INACTIVE').optional()
+    status: joi.string().valid(STATUS.ACTIVE, STATUS.INACTIVE).optional()
 });
 
 export const employeeIdValidator = joi.object({

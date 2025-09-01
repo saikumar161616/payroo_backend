@@ -1,6 +1,7 @@
 import { Default } from "../../config/default";
 import { CustomError } from "../../error-handlers/custom.error";
 import HTTP_STATUS from "../../constants/http.constants";
+import { STATUS } from "../../constants/feild.constants";
 import EMPLOYEE_CONSTANTS from "./employee.constants";
 import { EmployeeModel } from "./employee.model";
 
@@ -34,7 +35,7 @@ class EmployeeService extends Default {
             }
 
         }
-        catch (error:any) {
+        catch (error: any) {
             this.logger.error(`Inside EmployeeService - createNewEmployee method - Error while creating new employee: ${error}`);
             throw new CustomError((error instanceof CustomError) ? error.message : 'Error! Please try again later', error.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR);
         }
@@ -58,14 +59,14 @@ class EmployeeService extends Default {
 
             if (updateData.email && updateData.email !== existingEmployee.email) {
                 const emailExists = await EmployeeModel.findOne({ email: updateData.email });
-                if (emailExists) throw new CustomError(EMPLOYEE_CONSTANTS.EMPLOYEE_ALREADY_EXISTS, HTTP_STATUS.CONFLICT   );
+                if (emailExists) throw new CustomError(EMPLOYEE_CONSTANTS.EMPLOYEE_ALREADY_EXISTS, HTTP_STATUS.CONFLICT);
             }
 
             const updatedEmployee = await EmployeeModel.findOneAndUpdate(
                 { id: employeeId },
                 { $set: updateData },
                 { new: true }
-            );                                  
+            );
             if (!updatedEmployee) throw new CustomError('Failed to update employee', HTTP_STATUS.INTERNAL_SERVER_ERROR);
 
             const { id, firstName, lastName, email, type, status, bank, baseHourlyRate, superRate } = updatedEmployee.toObject();
@@ -77,7 +78,7 @@ class EmployeeService extends Default {
             }
 
         }
-        catch (error:any) {
+        catch (error: any) {
             this.logger.error(`Inside EmployeeService - updateEmployee method - Error while updating employee: ${error}`);
             throw new CustomError((error instanceof CustomError) ? error.message : 'Error! Please try again later', error.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR);
         }
@@ -91,7 +92,7 @@ class EmployeeService extends Default {
     async getAllEmployees() {
         try {
             this.logger.info('Inside EmployeeService - getAllEmployees method');
-            const employees = await EmployeeModel.find({}, { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }).lean();
+            const employees = await EmployeeModel.find({ status: STATUS.ACTIVE }, { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }).lean();
             return {
                 status: true,
                 message: EMPLOYEE_CONSTANTS.EMPLOYEE_FETCHED,
