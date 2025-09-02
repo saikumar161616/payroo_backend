@@ -93,6 +93,7 @@ class EmployeeService extends Default {
         try {
             this.logger.info('Inside EmployeeService - getAllEmployees method');
             const employees = await EmployeeModel.find({ status: STATUS.ACTIVE }, { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }).lean();
+            console.log(employees);
             return {
                 status: true,
                 message: EMPLOYEE_CONSTANTS.EMPLOYEE_FETCHED,
@@ -100,6 +101,32 @@ class EmployeeService extends Default {
             }
         } catch (error: any) {
             this.logger.error(`Inside EmployeeService - getAllEmployees method - Error while fetching employees: ${error}`);
+            throw new CustomError((error instanceof CustomError) ? error.message : 'Error! Please try again later', error.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR);
+        }
+    };
+
+
+    /**
+     * @method EmployeeService:generateToken
+     * @description Service to generate a token for an employee based on their ID and email.
+     * @param employeeId 
+     * @param email 
+    */
+    async generateToken(body: any) {
+        try {
+            this.logger.info('Inside EmployeeService - generateToken method');
+ 
+            const token = await this.jwtTokenGenerator(body);
+
+            return {
+                status: true,
+                message: 'Token generated successfully',
+                data: token       
+            }
+
+        }       
+        catch (error: any) {
+            this.logger.error(`Inside EmployeeService - generateToken method - Error while generating token: ${error}`);
             throw new CustomError((error instanceof CustomError) ? error.message : 'Error! Please try again later', error.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR);
         }
     };

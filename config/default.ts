@@ -10,6 +10,7 @@ export class Default {
     private loggerInstance: Logger;
     public paginationOffset = 0;
     public paginationLimit = 10;
+    public jwtTokenGenerator = this.generateJwtToken;
 
     private jwtSecretKey = config.SERVER.JWT_SECRET_KEY
 

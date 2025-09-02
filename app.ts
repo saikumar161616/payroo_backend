@@ -28,11 +28,14 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json({ limit: '10mb' }));
 
 // 
+console.log("CORS_ORIGINS", config.SERVER.CORS_ORIGINS);
 
 // Configure CORS options with dynamic validation based on config
 const corsOptionsDelegate: CorsOptions = {
+    
     origin: (origin, callback) => {
         // Allow all origins if config allows '*'
+
         if (config.SERVER.CORS_ORIGINS[0] === '*') {
             callback(null, true);
         }

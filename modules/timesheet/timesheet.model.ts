@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import mongoose, { Schema, model, Document } from 'mongoose';
 import joi from 'joi';
 import { helperUtil } from '../../utilities/helper.util';
 
@@ -10,7 +10,7 @@ export interface TimesheetEntry {
 }
 
 export interface Timesheet extends Document {
-    employeeId: string;
+    employeeId: any;
     periodStart: Date;
     periodEnd: Date;
     entries: TimesheetEntry[];
@@ -38,7 +38,8 @@ const timeSheetEntrySchema = new Schema<TimesheetEntry>({
 
 const timesheetSchema = new Schema<Timesheet>({
     employeeId: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'employee',
         required: true,
     },
     periodStart: {
@@ -52,6 +53,10 @@ const timesheetSchema = new Schema<Timesheet>({
     entries: {
         type: [timeSheetEntrySchema],
         required: true,
+    },
+    allowances: {
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 
@@ -60,7 +65,7 @@ timesheetSchema.index({ employeeId: 1, periodStart: 1, periodEnd: 1 }, { unique:
 
 export const TimesheetModel = model<Timesheet>('timesheet', timesheetSchema);
 
-export const timesheetValidator = joi.object({
+export const addtimesheetValidator = joi.object({
     employeeId: joi.string().required(),
     periodStart: joi.date().required(),
     periodEnd: joi.date().required(),
@@ -73,6 +78,27 @@ export const timesheetValidator = joi.object({
         })
     ).min(1).required(),
     allowances: joi.number().min(0).default(0)
+});
+
+export const gettimesheetValidator = joi.object({
+    employeeId: joi.string().required(),
+    periodStart: joi.string().required(),
+    periodEnd: joi.string().required(),
+});
+
+export const updatetimesheetValidator = joi.object({
+    employeeId: joi.string().required(),
+    periodStart: joi.date().required(),
+    periodEnd: joi.date().required(),
+    entries: joi.array().items(
+        joi.object({
+            date: joi.date().required(),
+            start: joi.string().pattern(/^([0-1]\d|2[0-3]):([0-5]\d)$/).required(), // HH:mm format
+            end: joi.string().pattern(/^([0-1]\d|2[0-3]):([0-5]\d)$/).required(),   // HH:mm format
+            unpaidBreakMins: joi.number().min(0).required()
+        })
+    ).min(1).required(),
+    allowances: joi.number().min(0).default(0).optional()
 });
 
 

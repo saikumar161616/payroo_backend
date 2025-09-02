@@ -113,6 +113,43 @@ class EmployeeController extends Default {
             });
         }
     };
+
+    /**
+     * @method EmployeeController:getTokenController
+     * @description Controller to handle generating a token for an employee.     
+     * @param req 
+     * @param res 
+     * @returns
+    */
+    async getTokenController(req: Request, res: Response) {
+        try {
+            this.logger.info('Inside EmployeeController - getTokenController method');
+            if (!req.body) throw new CustomError('Full Name is required', HTTP_STATUS.BAD_REQUEST);
+
+            const response = await employeeService.generateToken(req.body);
+            if (!response) throw new CustomError('Failed to generate token', HTTP_STATUS.INTERNAL_SERVER_ERROR);
+
+            return res.status(HTTP_STATUS.OK).json({
+                status: true,
+                message: 'Token generated successfully',
+                data: response.data
+            });
+        }
+        catch (error: any) {
+            this.logger.error(`Inside EmployeeController - getTokenController method - Error while generating token: ${error}`);
+            if (error instanceof CustomError) {
+                return res.status(error.statusCode).json({
+                    message: error.message || error,
+                    status: false
+                });
+            }
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+                status: false,
+                message: error
+            });
+        }
+    }       
+
 };
 
 export default new EmployeeController();
