@@ -17,8 +17,12 @@ class EmployeeService extends Default {
      * @param employeeData 
     */
     async createNewEmployee(employeeData: any) {
+        // TO ensure atomitcity and prevent partial saves - using mongoose transactions
+        const session = await EmployeeModel.startSession();
+        session.startTransaction();
         try {
             this.logger.info('Inside EmployeeService - createNewEmployee method');
+
             // Logic to create a new employee in the database goes here.
             if (!employeeData) throw new CustomError('Employee data is required', HTTP_STATUS.BAD_REQUEST);
             const isEmployeeExist = await EmployeeModel.findOne({ email: employeeData.email });
@@ -28,6 +32,9 @@ class EmployeeService extends Default {
 
             const { id, firstName, lastName, email, type, status, bank, baseHourlyRate, superRate } = savedEmployee.toObject();
 
+            await session.commitTransaction();
+            session.endSession();
+
             return {
                 status: true,
                 message: EMPLOYEE_CONSTANTS.EMPLOYEE_CREATED,
@@ -36,6 +43,8 @@ class EmployeeService extends Default {
 
         }
         catch (error: any) {
+            await session.abortTransaction();
+            session.endSession();
             this.logger.error(`Inside EmployeeService - createNewEmployee method - Error while creating new employee: ${error}`);
             throw new CustomError((error instanceof CustomError) ? error.message : 'Error! Please try again later', error.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR);
         }
@@ -115,16 +124,16 @@ class EmployeeService extends Default {
     async generateToken(body: any) {
         try {
             this.logger.info('Inside EmployeeService - generateToken method');
- 
+
             const token = await this.jwtTokenGenerator(body);
 
             return {
                 status: true,
                 message: 'Token generated successfully',
-                data: token       
+                data: token
             }
 
-        }       
+        }
         catch (error: any) {
             this.logger.error(`Inside EmployeeService - generateToken method - Error while generating token: ${error}`);
             throw new CustomError((error instanceof CustomError) ? error.message : 'Error! Please try again later', error.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR);

@@ -38,7 +38,7 @@ const employeeSchema = new Schema<Employee>({
         type: String,
         required: true,
         unique: true,
-        default: helperUtil.generateUniqueId()
+        default: helperUtil.generateUniqueId('EMP')
     },
     firstName: {
         type: String,
