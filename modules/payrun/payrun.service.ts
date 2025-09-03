@@ -80,7 +80,7 @@ class PayrunService extends Default {
                 const tax = helperUtil.calculateTax(gross);
 
                 // calculate super
-                const superAmount = gross * 0.115  ;
+                const superAmount = gross * 0.115; // assuming 11.5% superannuation rate as per document or we can use emp.superRate if available
 
                 const net = gross - tax ;
 
