@@ -1,3 +1,5 @@
+import { v4 as uuid } from "uuid";
+
 class HelperUtil {
     constructor() {
 
@@ -5,7 +7,8 @@ class HelperUtil {
 
     // Generates a unique identifier based on current timestamp
     generateUniqueId(prefix: string): string {
-        let uniqueCode = (new Date().getTime()).toString(16).toUpperCase().slice(-7);
+        // let uniqueCode = (new Date().getTime()).toString(16).toUpperCase().slice(-8);
+        let uniqueCode = uuid().toUpperCase().replace(/-/g, "").slice(0, 8);
         return `${prefix}-${uniqueCode}`;
     }
 

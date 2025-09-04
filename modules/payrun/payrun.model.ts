@@ -1,9 +1,7 @@
 import mongoose, { Schema, model, Document } from 'mongoose';
 import joi from 'joi';
-import { helperUtil } from '../../utilities/helper.util';
 
 export interface Payslip {
-    id: string;
     employeeId: mongoose.Types.ObjectId;
     normalHours: number;
     overtimeHours: number;
@@ -17,7 +15,7 @@ export interface PayrunTotals {
     gross: number;
     tax: number;
     super: number;
-    net: number;        
+    net: number;
 }
 
 export interface Payrun extends Document {
@@ -28,81 +26,80 @@ export interface Payrun extends Document {
 }
 
 const payslipSchema = new Schema<Payslip>({
+    employeeId: {
+        type: Schema.Types.ObjectId,
+        ref: 'employee',
+        required: true
+    },
+    normalHours: {
+        type: Number,
+        required: true
+    },
+    overtimeHours: {
+        type: Number,
+        required: true
+    },
+    gross: {
+        type: Number,
+        required: true
+    },
+    tax: {
+        type: Number,
+        required: true
+    },
+    super: {
+        type: Number,
+        required: true
+    },
+    net: {
+        type: Number,
+        required: true
+    }
+}, { _id: false });
+
+const payrunTotalsSchema = new Schema<PayrunTotals>({
+    gross: {
+        type: Number,
+        required: true
+    },
+    tax: {
+        type: Number,
+        required: true
+    },
+    super: {
+        type: Number,
+        required: true
+    },
+    net: {
+        type: Number,
+        required: true
+    }
+}, { _id: false });
+
+const payrunSchema = new Schema<Payrun>({
 
     id: {
         type: String,
         required: true,
         unique: true,
-        default: helperUtil.generateUniqueId('PAYRUN')
     },
 
-    employeeId: { 
-        type: Schema.Types.ObjectId, 
-        ref: 'employee', 
-        required: true 
-    },
-    normalHours: { 
-        type: Number,
-        required: true 
-    },
-    overtimeHours: { 
-        type: Number, 
-        required: true 
-    },
-    gross: { 
-        type: Number, 
-        required: true 
-    },
-    tax: { 
-        type: Number,
-        required: true 
-    },
-    super: { 
-        type: Number, 
-        required: true
-    },
-    net: { 
-        type: Number, 
-        required: true 
-    }
-}, { _id: false });
-
-const payrunTotalsSchema = new Schema<PayrunTotals>({
-    gross: { 
-        type: Number,
-        required: true
-    },
-    tax: { 
-        type: Number,
-        required: true
-    },
-    super: { 
-        type: Number,
-        required: true  
-    },
-    net: {
-        type: Number,
-        required: true
-    }        
-}, { _id: false }); 
-
-const payrunSchema = new Schema<Payrun>({
     periodStart: {
         type: Date,
         required: true
-    },  
+    },
     periodEnd: {
-        type: Date, 
+        type: Date,
         required: true
     },
     totals: {
-        type: payrunTotalsSchema,   
+        type: payrunTotalsSchema,
         required: true
     },
     payslips: {
         type: [payslipSchema],
         required: true,
-        validate: [(val: Payslip[]) => val.length > 0, 'There must be at least one payslip']
+        // validate: [(val: Payslip[]) => val.length > 0, 'There must be at least one payslip']
     }
 }, { timestamps: true });
 
@@ -113,3 +110,4 @@ export const payrunRequestValidator = joi.object({
     periodEnd: joi.date().required(),
     employeeIds: joi.array().items(joi.string())
 });
+
