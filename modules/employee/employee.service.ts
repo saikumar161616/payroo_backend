@@ -102,7 +102,6 @@ class EmployeeService extends Default {
         try {
             this.logger.info('Inside EmployeeService - getAllEmployees method');
             const employees = await EmployeeModel.find({ status: STATUS.ACTIVE }, { _id: 0, __v: 0, createdAt: 0, updatedAt: 0 }).lean();
-            console.log(employees);
             return {
                 status: true,
                 message: EMPLOYEE_CONSTANTS.EMPLOYEE_FETCHED,

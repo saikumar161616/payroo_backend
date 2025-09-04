@@ -39,7 +39,6 @@ class TimesheetMiddleware extends Default {
     async prepareGetTimesheets(req: Request, res: Response, next: NextFunction) {
         try {
             this.logger.info('Inside TimesheetMiddleware - prepareGetTimesheets method');
-            console.log("req.query", req.query);
             await gettimesheetValidator.validateAsync(req.query);
             next();
         } catch (error) {

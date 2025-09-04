@@ -39,8 +39,6 @@ class TimesheetService extends Default {
                 periodEnd: timesheetData.periodEnd
             });
 
-            console.log("existingTimesheet", timesheetData);
-
             if (existingTimesheet) throw new CustomError('A timesheet for this employee and period already exists', HTTP_STATUS.CONFLICT);
         
             const newTimesheet = new TimesheetModel(timesheetData);
@@ -78,13 +76,9 @@ class TimesheetService extends Default {
             query.employeeId = employee._id;
             query.periodStart = new Date(query.periodStart);
             query.periodEnd = new Date(query.periodEnd);
-
-            console.log("query", query);
             
             // Fetch timesheets based on query parameters
             const timesheets = await TimesheetModel.find({ ...query });
-
-            console.log("timesheets", timesheets);
 
             return {
                 status: true,

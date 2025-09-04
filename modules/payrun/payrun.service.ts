@@ -52,8 +52,6 @@ class PayrunService extends Default {
                 };
                 const timesheets = await TimesheetModel.aggregate(PayrunQuery.getTimesheetQuery(matchQuery));
 
-                console.log(JSON.stringify(timesheets), 'in 555');
-
                 if (!timesheets || timesheets.length === 0) continue; // skip if no timesheet found
 
                 // Aggregate all entries and allowances
