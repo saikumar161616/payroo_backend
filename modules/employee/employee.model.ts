@@ -118,5 +118,5 @@ export const updateEmployeeSchemaValidator = joi.object({
 });
 
 export const employeeIdValidator = joi.object({
-    id: joi.string().pattern(/^EMP\-[A-Z0-9]{7}$/).required()
+    id: joi.string().required()
 });

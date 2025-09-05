@@ -13,20 +13,28 @@ class HelperUtil {
     }
 
     calculateTax(gross: number): number {
-        const brackets = [
-            { threshold: 5000, rate: 0.45, base: 740 },
-            { threshold: 3000, rate: 0.37, base: 365 },
-            { threshold: 1500, rate: 0.325, base: 177.5 },
-            { threshold: 900, rate: 0.19, base: 53 },
-            { threshold: 370, rate: 0.10, base: 0 },
-        ];
-
-        for (const bracket of brackets) {
-            if (gross > bracket.threshold) {
-                return bracket.base + (gross - bracket.threshold) * bracket.rate;
-            }
+        let tax = 0;
+        if (gross > 5000) {
+            tax += (gross - 5000) * 0.45;
+            gross = 5000;
         }
-        return 0;
+        if (gross > 3000) {
+            tax += (gross - 3000) * 0.37;
+            gross = 3000;
+        }
+        if (gross > 1500) {
+            tax += (gross - 1500) * 0.325;
+            gross = 1500;
+        }
+        if (gross > 900) {
+            tax += (gross - 900) * 0.19;
+            gross = 900;
+        }
+        if (gross > 370) {
+            tax += (gross - 370) * 0.10;
+            gross = 370;
+        }
+        return tax;
     }
 }
 
